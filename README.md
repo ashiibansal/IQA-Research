@@ -1,6 +1,6 @@
-📘 Beyond Scores: Explainable Image Quality Assessment via Restoration Parameter Estimation
+# 📘 Beyond Scores: Explainable Image Quality Assessment via Restoration Parameter Estimation
 
-🔎 Project Overview
+### 🔎 Project Overview
 
 Traditional Image Quality Assessment (IQA) models predict a subjective quality score (e.g., 4/10). While useful for benchmarking, such scores are not actionable and do not indicate how to fix a degraded image.
 
@@ -16,7 +16,7 @@ These predicted parameters can be directly used to guide image restoration.
 
 ⸻
 
-🧠 Key Idea
+### 🧠 Key Idea
 
 Input: Degraded image
 Output: Parameter vector
@@ -35,7 +35,8 @@ This makes the system:
   
 ⸻
 
-🧪 Model Details
+### 🧪 Model Details
+
 	•	Backbone: CNN-based regression network (ResNet-based architecture)
 	•	Loss Function: Mean Squared Error (MSE)
 	•	Output: 4-dimensional parameter vector
@@ -43,7 +44,7 @@ This makes the system:
 
 ⸻
 
-🎯 Research Contribution
+### 🎯 Research Contribution
 
 This project proposes an alternative formulation of blind IQA:
 	•	Replaces subjective score prediction with parameter regression
