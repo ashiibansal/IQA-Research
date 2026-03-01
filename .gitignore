@@ -1,0 +1,5 @@
+degraded_images/
+clean_images/
+restoration_model.pth
+__pycache__/
+.DS_Store
