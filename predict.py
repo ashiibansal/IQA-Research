@@ -2,11 +2,16 @@ import torch
 from torchvision import transforms
 from PIL import Image
 from model import RestorationParameterPredictor
+import sys
 
 # --- 1. Settings ---
 MODEL_PATH = "restoration_model.pth"
-# Updated to match your .jpeg file
-IMAGE_PATH = "boat.png" 
+
+# Accept image path from command line argument
+if len(sys.argv) > 1:
+    IMAGE_PATH = sys.argv[1]
+else:
+    IMAGE_PATH = "degraded_images/degraded_0001.jpg"
 
 # Use the same bounds from our dataset to de-normalize the results
 bounds = {
@@ -22,27 +27,36 @@ def denormalize(value, param_name):
 
 # --- 2. Load Model ---
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 model = RestorationParameterPredictor().to(device)
-# Load the trained weights
+
+# Load trained weights
 model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
+
 model.eval()
 
-# --- 3. Preprocess Image ---
+# --- 3. Image Preprocessing ---
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
 ])
 
 def predict_degradation(img_path):
-    # Load and convert image
-    img = Image.open(img_path).convert('RGB')
-    img_tensor = transform(img).unsqueeze(0).to(device)  # Add batch dimension
+
+    # Load image
+    img = Image.open(img_path).convert("RGB")
+
+    # Apply preprocessing
+    img_tensor = transform(img).unsqueeze(0).to(device)
 
     with torch.no_grad():
-        preds = model(img_tensor).squeeze(0)  # Remove batch dimension
+        preds = model(img_tensor).squeeze(0)
 
-    # Now preds is shape (4,)
+    # De-normalize predictions
     blur_pred = denormalize(preds[0].item(), 'blur')
     noise_pred = denormalize(preds[1].item(), 'noise')
     jpeg_pred = denormalize(preds[2].item(), 'jpeg')
@@ -57,14 +71,21 @@ def predict_degradation(img_path):
 
     return results
 
+
 if __name__ == "__main__":
+
     try:
         print(f"Analyzing: {IMAGE_PATH}...")
+
         metrics = predict_degradation(IMAGE_PATH)
+
         print("\n--- Predicted Degradation Metrics ---")
+
         for key, value in metrics.items():
             print(f"{key}: {value:.4f}")
+
     except FileNotFoundError:
         print(f"Error: Could not find image at {IMAGE_PATH}")
+
     except Exception as e:
         print(f"An error occurred: {e}")
