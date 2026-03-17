@@ -1,0 +1,15 @@
+venv/
+degraded_images/
+clean_images/
+*.pth
+*.jpg
+*.png
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store
+restored_output.*
+test_*.*
